@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block titulo %}Dashboard Funcionário - {{ super() }}{% endblock %}
+
+{% block conteudo %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-calendar-check"></i> Meus Agendamentos</h4>
+            </div>
+            <div class="card-body">
+                {% if agendamentos %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Contato</th>
+                                    <th>Serviço</th>
+                                    <th>Data/Hora</th>
+                                    <th>Status</th>
+                                    <th>Valor</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for agendamento in agendamentos %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ agendamento[1] }}</strong>
+                                    </td>
+                                    <td>
+                                        {% if agendamento[3] %}
+                                            <a href="https://wa.me/55{{ agendamento[3] }}" class="whatsapp-btn btn-sm" target="_blank">
+                                                <i class="bi bi-whatsapp"></i>
+                                            </a>
+                                        {% endif %}
+                                        {% if agendamento[2] %}
+                                            <small class="d-block">{{ agendamento[2] }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ agendamento[4] }}</td>
+                                    <td>{{ agendamento[5] }}</td>
+                                    <td>
+                                        {% if agendamento[6] == 'pendente' %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% elif agendamento[6] == 'aguardando_confirmacao' %}
+                                            <span class="badge bg-info">Aguardando Confirmação</span>
+                                        {% elif agendamento[6] == 'confirmado' %}
+                                            <span class="badge bg-success">Confirmado</span>
+                                        {% elif agendamento[6] == 'concluido' %}
+                                            <span class="badge bg-primary">Concluído</span>
+                                        {% elif agendamento[6] == 'cancelado' %}
+                                            <span class="badge bg-danger">Cancelado</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if agendamento[7] == 0 %}
+                                            <span class="text-success fw-bold">GRATUITO</span>
+                                        {% else %}
+                                            R$ {{ "%.2f"|format(agendamento[7]) }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if agendamento[6] == 'confirmado' %}
+                                            <a href="{{ url_for('concluir_atendimento', agendamento_id=agendamento[0]) }}" 
+                                               class="btn btn-success btn-sm">
+                                                <i class="bi bi-check-circle"></i> Concluir
+                                            </a>
+                                        {% endif %}
+                                        {% if agendamento[3] %}
+                                            <a href="https://wa.me/55{{ agendamento[3] }}" class="btn btn-outline-success btn-sm" target="_blank">
+                                                <i class="bi bi-whatsapp"></i> Contatar
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="bi bi-calendar-x fs-1 text-muted"></i>
+                        <h5 class="text-muted mt-2">Nenhum agendamento encontrado</h5>
+                        <p class="text-muted">Seus agendamentos aparecerão aqui.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
