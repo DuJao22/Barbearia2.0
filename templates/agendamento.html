@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+
+{% block titulo %}Novo Agendamento - {{ super() }}{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-calendar-plus"></i> Novo Agendamento</h4>
+            </div>
+            <div class="card-body">
+                <!-- Programa de Fidelidade Info -->
+                {% if fidelidade and fidelidade[3] > 0 %}
+                <div class="alert alert-success">
+                    <i class="bi bi-gift"></i> 
+                    <strong>Você tem {{ fidelidade[3] }} corte(s) gratuito(s) disponível(is)!</strong>
+                    Marque a opção abaixo para usar um corte gratuito.
+                </div>
+                {% endif %}
+                
+                <form method="POST" id="formAgendamento">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="funcionario_id" class="form-label">Funcionário</label>
+                            <select class="form-select" id="funcionario_id" name="funcionario_id" required>
+                                <option value="">Selecione um funcionário</option>
+                                {% for funcionario in funcionarios %}
+                                <option value="{{ funcionario[0] }}" data-whatsapp="{{ funcionario[4] }}">
+                                    {{ funcionario[1] }} - R$ {{ "%.2f"|format(funcionario[2]) }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="servico_id" class="form-label">Serviço</label>
+                            <select class="form-select" id="servico_id" name="servico_id" required>
+                                <option value="">Selecione um serviço</option>
+                                {% for servico in servicos %}
+                                <option value="{{ servico[0] }}" data-preco="{{ servico[2] }}" data-duracao="{{ servico[3] }}">
+                                    {{ servico[1] }} - R$ {{ "%.2f"|format(servico[2]) }} ({{ servico[3] }}min)
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="data" class="form-label">Data</label>
+                            <input type="date" class="form-control" id="data" name="data" required min="{{ (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d') }}">
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="horario" class="form-label">Horário</label>
+                            <select class="form-select" id="horario" name="horario" required disabled>
+                                <option value="">Selecione data e funcionário primeiro</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Usar Corte Gratuito -->
+                    {% if fidelidade and fidelidade[3] > 0 %}
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="usar_corte_gratuito" name="usar_corte_gratuito">
+                            <label class="form-check-label" for="usar_corte_gratuito">
+                                <i class="bi bi-gift text-success"></i> Usar um corte gratuito
+                            </label>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <!-- Campo oculto para data_hora -->
+                    <input type="hidden" id="data_hora" name="data_hora">
+                    
+                    <!-- Loading -->
+                    <div class="loading" id="loading">
+                        <div class="spinner-border" role="status">
+                            <span class="visually-hidden">Carregando...</span>
+                        </div>
+                        <p>Verificando horários disponíveis...</p>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success" id="btnAgendar" disabled>
+                            <i class="bi bi-calendar-check"></i> Confirmar Agendamento
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extras %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const funcionarioSelect = document.getElementById('funcionario_id');
+    const dataInput = document.getElementById('data');
+    const horarioSelect = document.getElementById('horario');
+    const dataHoraInput = document.getElementById('data_hora');
+    const btnAgendar = document.getElementById('btnAgendar');
+    const loading = document.getElementById('loading');
+    
+    function atualizarHorarios() {
+        const funcionarioId = funcionarioSelect.value;
+        const data = dataInput.value;
+        
+        if (!funcionarioId || !data) {
+            horarioSelect.disabled = true;
+            horarioSelect.innerHTML = '<option value="">Selecione data e funcionário primeiro</option>';
+            btnAgendar.disabled = true;
+            return;
+        }
+        
+        loading.style.display = 'block';
+        horarioSelect.disabled = true;
+        
+        fetch(`/api/horarios_disponiveis?funcionario_id=${funcionarioId}&data=${data}`)
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                horarioSelect.innerHTML = '<option value="">Selecione um horário</option>';
+                
+                if (data.horarios_disponiveis.length > 0) {
+                    data.horarios_disponiveis.forEach(horario => {
+                        const option = document.createElement('option');
+                        option.value = horario;
+                        option.textContent = horario;
+                        horarioSelect.appendChild(option);
+                    });
+                    horarioSelect.disabled = false;
+                } else {
+                    horarioSelect.innerHTML = '<option value="">Nenhum horário disponível</option>';
+                }
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                console.error('Erro:', error);
+                horarioSelect.innerHTML = '<option value="">Erro ao carregar horários</option>';
+            });
+    }
+    
+    function atualizarDataHora() {
+        const data = dataInput.value;
+        const horario = horarioSelect.value;
+        
+        if (data && horario) {
+            dataHoraInput.value = `${data} ${horario}:00`;
+            btnAgendar.disabled = false;
+        } else {
+            dataHoraInput.value = '';
+            btnAgendar.disabled = true;
+        }
+    }
+    
+    funcionarioSelect.addEventListener('change', atualizarHorarios);
+    dataInput.addEventListener('change', atualizarHorarios);
+    horarioSelect.addEventListener('change', atualizarDataHora);
+    
+    // Definir data mínima como amanhã
+    const amanha = new Date();
+    amanha.setDate(amanha.getDate() + 1);
+    dataInput.min = amanha.toISOString().split('T')[0];
+});
+</script>
+{% endblock %}
