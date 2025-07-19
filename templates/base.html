@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}{{ configuracoes_barbearia.nome_barbearia if configuracoes_barbearia else 'Barbearia Premium' }}{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --cor-primaria: #1a1a1a;
+            --cor-secundaria: #2d2d2d;
+            --cor-destaque: #ff6b6b;
+            --cor-sucesso: #51cf66;
+            --cor-aviso: #ffd43b;
+            --cor-info: #74c0fc;
+            --cor-fundo: #121212;
+            --cor-texto: #ffffff;
+            --cor-card: #1e1e1e;
+            --cor-input: #2d2d2d;
+            --cor-border: #404040;
+            --cor-hover: #333333;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--cor-fundo);
+            color: var(--cor-texto);
+            line-height: 1.6;
+            background-image: 
+                radial-gradient(circle at 25% 25%, #2d2d2d 0%, transparent 50%),
+                radial-gradient(circle at 75% 75%, #1a1a1a 0%, transparent 50%);
+            min-height: 100vh;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria)) !important;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            border-bottom: 1px solid var(--cor-border);
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+            border-radius: 5px;
+            padding: 8px 15px !important;
+        }
+
+        .navbar-nav .nav-link:hover {
+            background-color: rgba(255,255,255,0.1);
+            transform: translateY(-1px);
+        }
+
+        .card {
+            border: none;
+            border-radius: 15px;
+            background-color: var(--cor-card);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.4);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            border: 1px solid var(--cor-border);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            border: none;
+            padding: 20px;
+            font-weight: 600;
+            border-bottom: 1px solid var(--cor-border);
+        }
+
+        .btn {
+            border-radius: 25px;
+            font-weight: 500;
+            padding: 10px 25px;
+            transition: all 0.3s ease;
+            border: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cor-info), #2980b9);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--cor-sucesso), #229954);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, var(--cor-destaque), #c0392b);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, var(--cor-aviso), #d68910);
+        }
+
+        .alert {
+            border: none;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border: 1px solid var(--cor-border);
+        }
+
+        .alert-success {
+            background-color: rgba(81, 207, 102, 0.1);
+            color: var(--cor-sucesso);
+            border-color: var(--cor-sucesso);
+        }
+
+        .alert-danger {
+            background-color: rgba(255, 107, 107, 0.1);
+            color: var(--cor-destaque);
+            border-color: var(--cor-destaque);
+        }
+
+        .alert-info {
+            background-color: rgba(116, 192, 252, 0.1);
+            color: var(--cor-info);
+            border-color: var(--cor-info);
+        }
+
+        .form-control, .form-select {
+            border-radius: 10px;
+            border: 2px solid var(--cor-border);
+            padding: 12px 15px;
+            transition: all 0.3s ease;
+            background-color: var(--cor-input);
+            color: var(--cor-texto);
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--cor-info);
+            box-shadow: 0 0 0 0.2rem rgba(116, 192, 252, 0.25);
+            background-color: var(--cor-hover);
+        }
+
+        .form-control::placeholder {
+            color: #888;
+        }
+
+        .input-group-text {
+            background-color: var(--cor-secundaria);
+            border-color: var(--cor-border);
+            color: var(--cor-texto);
+        }
+
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.4);
+            background-color: var(--cor-card);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--cor-primaria), var(--cor-secundaria));
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 15px;
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: var(--cor-border);
+            background-color: var(--cor-card);
+            color: var(--cor-texto);
+        }
+
+        .table tbody tr:hover {
+            background-color: var(--cor-hover);
+        }
+
+        .badge {
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .perfil-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid white;
+        }
+
+        .estatistica-card {
+            background: linear-gradient(135deg, var(--cor-primaria) 0%, var(--cor-secundaria) 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            margin-bottom: 20px;
+            border: 1px solid var(--cor-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .estatistica-valor {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .estatistica-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .fidelidade-card {
+            background: linear-gradient(135deg, var(--cor-sucesso), #229954);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid var(--cor-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background-color: var(--cor-input);
+        }
+
+        .progress-bar {
+            border-radius: 10px;
+        }
+
+        .whatsapp-btn {
+            background: linear-gradient(135deg, #25d366, #128c7e);
+            color: white;
+            text-decoration: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.4);
+        }
+
+        .dropdown-menu {
+            background-color: var(--cor-card);
+            border: 1px solid var(--cor-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+        }
+
+        .dropdown-item {
+            color: var(--cor-texto);
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--cor-hover);
+            color: var(--cor-texto);
+        }
+
+        .dropdown-divider {
+            border-color: var(--cor-border);
+        }
+
+        .text-muted {
+            color: #888 !important;
+        }
+
+        .bg-light {
+            background-color: var(--cor-input) !important;
+        }
+
+        @media (max-width: 768px) {
+            .container-fluid {
+                padding: 10px;
+            }
+            
+            .card {
+                margin-bottom: 20px;
+            }
+            
+            .table-responsive {
+                font-size: 0.9rem;
+            }
+            
+            .btn {
+                padding: 8px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .estatistica-valor {
+                font-size: 2rem;
+            }
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner-border {
+            color: var(--cor-info);
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--cor-input);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--cor-border);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--cor-hover);
+        }
+    </style>
+    
+    {% block estilos_extras %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand logo-container" href="{% if session.tipo_usuario == 'admin' %}{{ url_for('dashboard_admin') }}{% elif session.tipo_usuario == 'funcionario' %}{{ url_for('dashboard_funcionario') }}{% else %}{{ url_for('dashboard_cliente') }}{% endif %}">
+                <img src="{{ configuracoes_barbearia.logo_url if configuracoes_barbearia and configuracoes_barbearia.logo_url else 'https://images.pexels.com/photos/1319460/pexels-photo-1319460.jpeg?auto=compress&cs=tinysrgb&w=100&h=100&fit=crop' }}" alt="Logo" class="logo-img">
+                <span>{{ configuracoes_barbearia.nome_barbearia if configuracoes_barbearia else 'Barbearia Premium' }}</span>
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    {% if session.usuario_id %}
+                        {% if session.tipo_usuario == 'admin' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('dashboard_admin') }}">
+                                    <i class="bi bi-speedometer2"></i> Dashboard
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('gerenciar_funcionarios') }}">
+                                    <i class="bi bi-people"></i> Funcionários
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('listar_clientes') }}">
+                                    <i class="bi bi-person-lines-fill"></i> Clientes
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('configuracoes_barbearia') }}">
+                                    <i class="bi bi-gear"></i> Configurações
+                                </a>
+                            </li>
+                        {% elif session.tipo_usuario == 'funcionario' %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('dashboard_funcionario') }}">
+                                    <i class="bi bi-calendar-check"></i> Meus Agendamentos
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('dashboard_cliente') }}">
+                                    <i class="bi bi-house"></i> Início
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('agendamento') }}">
+                                    <i class="bi bi-calendar-plus"></i> Agendar
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endif %}
+                </ul>
+                
+                <ul class="navbar-nav">
+                    {% if session.usuario_id %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <img src="{{ session.foto_perfil if session.foto_perfil else (configuracoes_barbearia.logo_url if session.tipo_usuario == 'admin' and configuracoes_barbearia else '/static/uploads/default-user.jpg') }}" alt="Perfil" class="perfil-img">
+                                {{ session.nome_usuario }}
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="{{ url_for('perfil') }}">
+                                    <i class="bi bi-person"></i> Meu Perfil
+                                </a></li>
+                                {% if session.tipo_usuario == 'admin' %}
+                                <li><a class="dropdown-item" href="{{ url_for('configuracoes_barbearia') }}">
+                                    <i class="bi bi-gear"></i> Configurações
+                                </a></li>
+                                {% endif %}
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{{ url_for('logout') }}">
+                                    <i class="bi bi-box-arrow-right"></i> Sair
+                                </a></li>
+                            </ul>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Conteúdo Principal -->
+    <div class="container-fluid py-4">
+        <!-- Mensagens Flash -->
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ 'danger' if category == 'erro' else 'success' if category == 'sucesso' else 'info' }} alert-dismissible fade show" role="alert">
+                        <i class="bi bi-{{ 'exclamation-triangle' if category == 'erro' else 'check-circle' if category == 'sucesso' else 'info-circle' }}"></i>
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block conteudo %}{% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 mt-5" style="background-color: var(--cor-primaria); border-top: 1px solid var(--cor-border);">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5 style="color: white;">{{ configuracoes_barbearia.nome_barbearia if configuracoes_barbearia else 'Barbearia Premium' }}</h5>
+                    <p class="mb-1" style="color: #ccc;">{{ configuracoes_barbearia.endereco if configuracoes_barbearia else 'Endereço não informado' }}</p>
+                    <p class="mb-1" style="color: #ccc;">{{ configuracoes_barbearia.horario_funcionamento if configuracoes_barbearia else 'Horário não informado' }}</p>
+                    <p style="color: #ccc;">{{ configuracoes_barbearia.dias_funcionamento if configuracoes_barbearia else 'Dias não informados' }}</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h6 style="color: white;">Contato</h6>
+                    {% if configuracoes_barbearia and configuracoes_barbearia.telefone_contato %}
+                        <p style="color: #ccc;"><i class="bi bi-telephone"></i> {{ configuracoes_barbearia.telefone_contato }}</p>
+                    {% endif %}
+                    {% if configuracoes_barbearia and configuracoes_barbearia.whatsapp_contato %}
+                        <a href="https://wa.me/55{{ configuracoes_barbearia.whatsapp_contato }}" class="whatsapp-btn" target="_blank">
+                            <i class="bi bi-whatsapp"></i> WhatsApp
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            <hr>
+            <div class="text-center">
+                <small style="color: #888;">&copy; 2025 {{ configuracoes_barbearia.nome_barbearia if configuracoes_barbearia else 'Barbearia Premium' }}. Todos os direitos reservados.</small>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    {% block scripts_extras %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block titulo %}Editar Cliente - {{ super() }}{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-person-gear"></i> Editar Cliente</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- Upload de Foto -->
+                    <div class="row mb-4">
+                        <div class="col-md-12 text-center">
+                            <div class="mb-3">
+                                <img src="{{ cliente[5] if cliente and cliente[5] else '/static/uploads/default-user.jpg' }}" 
+                                     alt="Foto de Perfil" class="rounded-circle" width="120" height="120" 
+                                     style="object-fit: cover; border: 4px solid #e9ecef;" id="preview-foto">
+                            </div>
+                            <div class="mb-3">
+                                <label for="foto_perfil" class="form-label">Foto de Perfil</label>
+                                <input type="file" class="form-control" id="foto_perfil" name="foto_perfil" 
+                                       accept="image/*" onchange="previewImage(this)">
+                                <div class="form-text">Formatos aceitos: JPG, PNG, GIF (máx. 16MB)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nome" class="form-label">Nome Completo</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="nome" name="nome" 
+                                       value="{{ cliente[1] if cliente else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" 
+                                       value="{{ cliente[2] if cliente else '' }}" disabled>
+                            </div>
+                            <div class="form-text">O email não pode ser alterado</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" class="form-control" id="telefone" name="telefone" 
+                                       value="{{ cliente[3] if cliente else '' }}" placeholder="(11) 99999-9999">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="whatsapp" class="form-label">WhatsApp</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-whatsapp"></i></span>
+                                <input type="tel" class="form-control" id="whatsapp" name="whatsapp" 
+                                       value="{{ cliente[4] if cliente else '' }}" placeholder="11999999999">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="{{ url_for('listar_clientes') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Voltar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extras %}
+<script>
+// Preview da imagem
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-foto').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Máscara para telefone
+document.getElementById('telefone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 11) {
+        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (value.length >= 7) {
+        value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    } else if (value.length >= 3) {
+        value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+    }
+    e.target.value = value;
+});
+
+// Máscara para WhatsApp (apenas números)
+document.getElementById('whatsapp').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+</script>
+{% endblock %}

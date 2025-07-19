@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block titulo %}Meu Perfil - {{ super() }}{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-person-gear"></i> Meu Perfil</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- Upload de Foto -->
+                    <div class="row mb-4">
+                        <div class="col-md-12 text-center">
+                            {% if session.tipo_usuario == 'admin' %}
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    <strong>Administrador:</strong> Sua foto de perfil é automaticamente a logo da barbearia. 
+                                    Para alterá-la, vá em <a href="{{ url_for('configuracoes_barbearia') }}" class="alert-link">Configurações da Barbearia</a>.
+                                </div>
+                            {% endif %}
+                            <div class="mb-3">
+                                <img src="{{ usuario[5] if usuario and usuario[5] else '/static/uploads/default-user.jpg' }}" 
+                                     alt="Foto de Perfil" class="rounded-circle" width="120" height="120" 
+                                     style="object-fit: cover; border: 4px solid #e9ecef;" id="preview-foto">
+                            </div>
+                            {% if session.tipo_usuario != 'admin' %}
+                            <div class="mb-3">
+                                <label for="foto_perfil" class="form-label">Foto de Perfil</label>
+                                <input type="file" class="form-control" id="foto_perfil" name="foto_perfil" 
+                                       accept="image/*" onchange="previewImage(this)">
+                                <div class="form-text">Formatos aceitos: JPG, PNG, GIF (máx. 16MB)</div>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nome" class="form-label">Nome Completo</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="nome" name="nome" 
+                                       value="{{ usuario[1] if usuario else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="email" 
+                                       value="{{ usuario[2] if usuario else '' }}" disabled>
+                            </div>
+                            <div class="form-text">O email não pode ser alterado</div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="telefone" class="form-label">Telefone</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" class="form-control" id="telefone" name="telefone" 
+                                       value="{{ usuario[3] if usuario else '' }}" placeholder="(11) 99999-9999">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="whatsapp" class="form-label">WhatsApp</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-whatsapp"></i></span>
+                                <input type="tel" class="form-control" id="whatsapp" name="whatsapp" 
+                                       value="{{ usuario[4] if usuario else '' }}" placeholder="11999999999">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Salvar Alterações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Programa de Fidelidade (apenas para clientes) -->
+        {% if session.tipo_usuario == 'cliente' and fidelidade %}
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5><i class="bi bi-award"></i> Meu Programa de Fidelidade</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="text-center p-3 bg-light rounded">
+                            <h3 class="text-primary">{{ fidelidade[2] }}</h3>
+                            <p class="mb-0">Cortes Realizados</p>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="text-center p-3 bg-success text-white rounded">
+                            <h3>{{ fidelidade[3] }}</h3>
+                            <p class="mb-0">Cortes Gratuitos</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mt-3">
+                    <label class="form-label">Progresso para próximo corte gratuito:</label>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: {{ (fidelidade[2] % 10) * 10 }}%">
+                            {{ fidelidade[2] % 10 }}/10
+                        </div>
+                    </div>
+                    <small class="text-muted">{{ 10 - (fidelidade[2] % 10) }} cortes restantes</small>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extras %}
+<script>
+// Preview da imagem
+function previewImage(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-foto').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Máscara para telefone
+document.getElementById('telefone').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 11) {
+        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (value.length >= 7) {
+        value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    } else if (value.length >= 3) {
+        value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+    }
+    e.target.value = value;
+});
+
+// Máscara para WhatsApp (apenas números)
+document.getElementById('whatsapp').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+</script>
+{% endblock %}

@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block titulo %}Configurações da Barbearia - {{ super() }}{% endblock %}
+
+{% block conteudo %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h4><i class="bi bi-gear"></i> Configurações da Barbearia</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    <!-- Logo da Barbearia -->
+                    <div class="row mb-4">
+                        <div class="col-md-12 text-center">
+                            <div class="mb-3">
+                                <img src="{{ configuracoes.logo_url if configuracoes and configuracoes.logo_url else '/static/uploads/logo-barbearia.jpg' }}" 
+                                     alt="Logo da Barbearia" class="rounded" width="150" height="150" 
+                                     style="object-fit: cover; border: 4px solid #e9ecef;" id="preview-logo">
+                            </div>
+                            <div class="mb-3">
+                                <label for="logo_barbearia" class="form-label">Logo da Barbearia</label>
+                                <input type="file" class="form-control" id="logo_barbearia" name="logo_barbearia" 
+                                       accept="image/*" onchange="previewLogo(this)">
+                                <div class="form-text">Formatos aceitos: JPG, PNG, GIF (máx. 16MB)</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Informações Básicas -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="nome_barbearia" class="form-label">Nome da Barbearia</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-shop"></i></span>
+                                <input type="text" class="form-control" id="nome_barbearia" name="nome_barbearia" 
+                                       value="{{ configuracoes.nome_barbearia if configuracoes else '' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="telefone_contato" class="form-label">Telefone de Contato</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                                <input type="tel" class="form-control" id="telefone_contato" name="telefone_contato" 
+                                       value="{{ configuracoes.telefone_contato if configuracoes else '' }}" 
+                                       placeholder="(11) 99999-9999">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="whatsapp_contato" class="form-label">WhatsApp</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-whatsapp"></i></span>
+                                <input type="tel" class="form-control" id="whatsapp_contato" name="whatsapp_contato" 
+                                       value="{{ configuracoes.whatsapp_contato if configuracoes else '' }}" 
+                                       placeholder="11999999999">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="endereco" class="form-label">Endereço</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                                <input type="text" class="form-control" id="endereco" name="endereco" 
+                                       value="{{ configuracoes.endereco if configuracoes else '' }}" 
+                                       placeholder="Rua, número - Bairro">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Horários de Funcionamento -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="horario_funcionamento" class="form-label">Horário de Funcionamento</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-clock"></i></span>
+                                <input type="text" class="form-control" id="horario_funcionamento" name="horario_funcionamento" 
+                                       value="{{ configuracoes.horario_funcionamento if configuracoes else '' }}" 
+                                       placeholder="08:00-18:00">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="dias_funcionamento" class="form-label">Dias de Funcionamento</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-calendar"></i></span>
+                                <input type="text" class="form-control" id="dias_funcionamento" name="dias_funcionamento" 
+                                       value="{{ configuracoes.dias_funcionamento if configuracoes else '' }}" 
+                                       placeholder="Segunda a Sábado">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Descrição -->
+                    <div class="mb-3">
+                        <label for="descricao" class="form-label">Descrição da Barbearia</label>
+                        <textarea class="form-control" id="descricao" name="descricao" rows="3" 
+                                  placeholder="Descreva sua barbearia...">{{ configuracoes.descricao if configuracoes else '' }}</textarea>
+                    </div>
+                    
+                    <!-- Redes Sociais -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="instagram" class="form-label">Instagram</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-instagram"></i></span>
+                                <input type="text" class="form-control" id="instagram" name="instagram" 
+                                       value="{{ configuracoes.instagram if configuracoes else '' }}" 
+                                       placeholder="@barbeariaexemplo">
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label for="facebook" class="form-label">Facebook</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-facebook"></i></span>
+                                <input type="text" class="form-control" id="facebook" name="facebook" 
+                                       value="{{ configuracoes.facebook if configuracoes else '' }}" 
+                                       placeholder="facebook.com/barbeariaexemplo">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Salvar Configurações
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts_extras %}
+<script>
+// Preview do logo
+function previewLogo(input) {
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('preview-logo').src = e.target.result;
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+
+// Máscara para telefone
+document.getElementById('telefone_contato').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length >= 11) {
+        value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+    } else if (value.length >= 7) {
+        value = value.replace(/(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+    } else if (value.length >= 3) {
+        value = value.replace(/(\d{2})(\d{0,5})/, '($1) $2');
+    }
+    e.target.value = value;
+});
+
+// Máscara para WhatsApp (apenas números)
+document.getElementById('whatsapp_contato').addEventListener('input', function(e) {
+    e.target.value = e.target.value.replace(/\D/g, '');
+});
+</script>
+{% endblock %}
